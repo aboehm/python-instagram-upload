@@ -61,7 +61,6 @@ class InstagramSession(object):
             "password": password,
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
         })
-        print(data)
 
         sig = _generate_signature(data)
 
@@ -72,7 +71,6 @@ class InstagramSession(object):
 
         r = self.session.post("https://instagram.com/api/v1/accounts/login/", payload)
         r_json = r.json()
-        print(r_json)
 
         if r_json.get('status') != "ok":
             return False
@@ -89,7 +87,6 @@ class InstagramSession(object):
 
         r = self.session.post("https://instagram.com/api/v1/media/upload/", data, files=files)
         r_json = r.json()
-        print(r_json)
 
         return r_json.get('media_id')
 
@@ -105,7 +102,6 @@ class InstagramSession(object):
             "extra": "{}",
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
         })
-        print(data)
 
         sig = _generate_signature(data)
 
@@ -116,7 +112,6 @@ class InstagramSession(object):
 
         r = self.session.post("https://instagram.com/api/v1/media/configure/", payload)
         r_json = r.json()
-        print(r_json)
 
         if r_json.get('status') != "ok":
             return False
