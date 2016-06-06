@@ -46,11 +46,12 @@ def _generate_user_agent():
 
 class InstagramSession(object):
 
-    def __init__(self):
+    def __init__(self, verbose=False):
         self.guid = str(uuid.uuid1())
         self.device_id = 'android-{}'.format(self.guid)
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': _generate_user_agent()})
+        self.verbose = verbose
 
     def login(self, username, password):
 
@@ -68,14 +69,21 @@ class InstagramSession(object):
             sig,
             urllib_quote_plus(data)
         )
+        if self.verbose:
+            print("JSON login payload: %s" % (payload))
 
         r = self.session.post("https://instagram.com/api/v1/accounts/login/", payload)
         r_json = r.json()
+        if self.verbose:
+            print("JSON login response: %s" % (r_json))
 
-        if r_json.get('status') != "ok":
-            return False
+        d = {} 
+        d["status"] = r_json["status"]
+        if "message" in r_json:
+            d["message"] = r_json["message"]
 
-        return True
+        return d
+
 
     def upload_photo(self, filename):
         data = {
@@ -87,8 +95,17 @@ class InstagramSession(object):
 
         r = self.session.post("https://instagram.com/api/v1/media/upload/", data, files=files)
         r_json = r.json()
+        if self.verbose:
+            print("File upload JSON response: %s" % (r_json))
 
-        return r_json.get('media_id')
+        d = {} 
+        d["status"] = r_json["status"]
+        if "media_id" in r_json:
+            d["media_id"] = r_json['media_id']
+        if "message" in r_json:
+            d["message"] = r_json["message"]
+
+        return d
 
     def configure_photo(self, media_id, caption):
         data = json.dumps({
@@ -109,13 +126,18 @@ class InstagramSession(object):
             sig,
             urllib_quote_plus(data)
         )
+        if self.verbose:
+            print("Foto configurion payload: %s" % (payload))
 
         r = self.session.post("https://instagram.com/api/v1/media/configure/", payload)
         r_json = r.json()
+        if self.verbose:
+            print("Foto configurion JSON response: %s" % (r_json))
 
-        if r_json.get('status') != "ok":
-            return False
+        d = { } 
+        d["status"] = r_json["status"]
+        if "message" in r_json:
+            d["message"] = r_json["message"]
 
-        return True
-
+        return d
 
